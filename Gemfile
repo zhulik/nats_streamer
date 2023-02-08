@@ -3,8 +3,9 @@
 source "https://rubygems.org"
 
 gem "async"
-
 gem "nats-pure"
+
+gem "zeitwerk"
 
 group :development, :test do
   gem "rake"
