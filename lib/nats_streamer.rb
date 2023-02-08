@@ -2,6 +2,9 @@
 
 require "zeitwerk"
 
+require "async"
+require "nats/client"
+
 loader = Zeitwerk::Loader.for_gem
 loader.setup
 
