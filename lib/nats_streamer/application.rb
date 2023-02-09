@@ -6,7 +6,6 @@ class NatsStreamer::Application
   include NatsStreamer::Logger
   include Memery
 
-  option :url
   option :config
 
   def run
@@ -19,7 +18,9 @@ class NatsStreamer::Application
 
   private
 
-  memoize def client = NATS.connect(url)
-
-  def jsm = client.jsm
+  memoize def jsm
+    NATS.connect(config.server_url).tap do
+      info { "Connected to #{config.server_url}" }
+    end.jsm
+  end
 end

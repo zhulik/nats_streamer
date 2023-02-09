@@ -9,12 +9,12 @@ class NatsStreamer::Deliverer
   # TODO: how to propely unsubscribe?
   option :subscriber
 
-  def deliver(**) = connection.post(".", **)
-
-  memoize def connection
-    Faraday.new(subscriber.url) do |f|
-      f.request :json
-      f.response :raise_error
-    end
+  def deliver(**)
+    info_measure(-> { connection.post(".", **) }) { "Event delivered to #{subscriber.name}: #{_1.round(2)}s" }
+  rescue StandardError => e
+    warn { "Event failed to be delivered to #{subscriber.name}" }
+    warn { e }
   end
+
+  memoize def connection = NatsStreamer::Connection.build(subscriber.url)
 end

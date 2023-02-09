@@ -21,10 +21,10 @@ RUN bundle install
 
 FROM base
 
-COPY --from=builder /mnt/vendor .
+COPY --from=builder /mnt .
 
 ADD . .
 
 USER app
 
-CMD ["bundle", "exec", "./exe/nats_streamer", "/config.yaml", "$PATH"]
+CMD ["bundle", "exec", "./exe/nats_streamer", "/config.yaml"]

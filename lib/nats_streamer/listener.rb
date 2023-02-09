@@ -12,6 +12,8 @@ class NatsStreamer::Listener
   option :subscriber
 
   def run
+    info { "Subscribing to #{subject}" }
+
     pull do |msg|
       Async { handle_message(msg) }
     end

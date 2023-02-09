@@ -33,8 +33,12 @@ class NatsStreamer::Stream
   end
 
   def create_stream!
+    info { "Creating stream '#{name}' with subjects #{subject_names}" }
+
     jsm.add_stream(name:, subjects: subject_names)
   rescue NATS::JetStream::Error::BadRequest
+    warn { "Configuration changed, attempting deleting and recreating stream #{name}" }
+
     jsm.delete_stream(name)
     retry
   end
