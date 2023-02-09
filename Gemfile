@@ -5,7 +5,12 @@ source "https://rubygems.org"
 gem "async"
 gem "nats-pure"
 
+gem "faraday"
+gem "memery"
 gem "zeitwerk"
+
+gem "dry-initializer"
+gem "dry-struct"
 
 group :development, :test do
   gem "rake"

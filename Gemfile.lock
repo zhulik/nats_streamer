@@ -15,15 +15,41 @@ GEM
     backport (1.2.0)
     benchmark (0.2.1)
     childprocess (4.1.0)
+    concurrent-ruby (1.2.0)
     console (1.16.2)
       fiber-local
     crack (0.4.5)
       rexml
     diff-lcs (1.5.0)
     docile (1.4.0)
+    dry-core (1.0.0)
+      concurrent-ruby (~> 1.0)
+      zeitwerk (~> 2.6)
+    dry-inflector (1.0.0)
+    dry-initializer (3.1.1)
+    dry-logic (1.5.0)
+      concurrent-ruby (~> 1.0)
+      dry-core (~> 1.0, < 2)
+      zeitwerk (~> 2.6)
+    dry-struct (1.6.0)
+      dry-core (~> 1.0, < 2)
+      dry-types (>= 1.7, < 2)
+      ice_nine (~> 0.11)
+      zeitwerk (~> 2.6)
+    dry-types (1.7.0)
+      concurrent-ruby (~> 1.0)
+      dry-core (~> 1.0, < 2)
+      dry-inflector (~> 1.0, < 2)
+      dry-logic (>= 1.4, < 2)
+      zeitwerk (~> 2.6)
     e2mmap (0.1.0)
+    faraday (2.7.4)
+      faraday-net_http (>= 2.0, < 3.1)
+      ruby2_keywords (>= 0.0.4)
+    faraday-net_http (3.0.2)
     fiber-local (1.0.0)
     hashdiff (1.0.1)
+    ice_nine (0.11.2)
     iniparse (1.5.0)
     io-event (1.1.6)
     jaro_winkler (1.5.4)
@@ -32,6 +58,8 @@ GEM
       rexml
     kramdown-parser-gfm (1.1.0)
       kramdown (~> 2.0)
+    memery (1.4.1)
+      ruby2_keywords (~> 0.0.2)
     nats-pure (2.2.1)
     nokogiri (1.14.1-x86_64-linux)
       racc (~> 1.4)
@@ -88,6 +116,7 @@ GEM
       rubocop (~> 1.33)
       rubocop-capybara (~> 2.17)
     ruby-progressbar (1.11.0)
+    ruby2_keywords (0.0.5)
     simplecov (0.22.0)
       docile (~> 1.1)
       simplecov-html (~> 0.11)
@@ -128,6 +157,10 @@ PLATFORMS
 DEPENDENCIES
   async
   async-rspec
+  dry-initializer
+  dry-struct
+  faraday
+  memery
   nats-pure
   overcommit
   rake

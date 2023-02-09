@@ -1,4 +1,10 @@
 #!/usr/bin/env ruby
 # frozen_string_literal: true
 
-require "nats_streamer"
+require_relative "../lib/nats_streamer"
+
+CONFIG = YAML.load(File.read(ARGV[0]), symbolize_names: true)
+
+Sync do
+  NatsStreamer::Application.new(url: "nats://127.0.0.1:4222", config: NatsStreamer::Config.new(CONFIG)).run
+end

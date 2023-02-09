@@ -1,9 +1,19 @@
 # frozen_string_literal: true
 
+require "erb"
+require "yaml"
+
 require "zeitwerk"
 
 require "async"
+require "async/notification"
 require "nats/client"
+require "memery"
+require "faraday"
+
+require "dry-initializer"
+require "dry/struct"
+require "dry/types"
 
 loader = Zeitwerk::Loader.for_gem
 loader.setup
