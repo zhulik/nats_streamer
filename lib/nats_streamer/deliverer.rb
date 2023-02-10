@@ -1,16 +1,20 @@
 # frozen_string_literal: true
 
 class NatsStreamer::Deliverer
-  extend Dry::Initializer
+  include NatsStreamer::Helpers
 
-  include NatsStreamer::Logger
-  include Memery
+  option :subscriber, type: T.Instance(NatsStreamer::Config::Subscriber)
+  option :metrics_store, type: T.Instance(NatsStreamer::Metrics::Store)
 
-  option :subscriber
-
-  def deliver(**)
-    info_measure(-> { connection.post(".", **) }) { "Event delivered to #{subscriber.name}: #{_1.round(2)}s" }
+  def deliver(**params)
+    name = params.dig(:event, :name)
+    info_measure(-> { "Event #{name.inspect} delivered to #{subscriber.name.inspect}: #{_1.round(2)}s" }) do
+      connection.post(".", **params)
+    end
+    metrics_store.inc(:delivered, subscriber: subscriber.name)
   end
+
+  private
 
   memoize def connection = NatsStreamer::Connection.build(subscriber.url)
 end

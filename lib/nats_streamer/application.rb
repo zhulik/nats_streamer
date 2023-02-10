@@ -1,26 +1,50 @@
 # frozen_string_literal: true
 
 class NatsStreamer::Application
-  extend Dry::Initializer
+  include NatsStreamer::Helpers
 
-  include NatsStreamer::Logger
-  include Memery
-
-  option :config
+  option :config, type: T.Instance(NatsStreamer::Config)
 
   def run
-    config.streams.each do |name, subjects|
-      NatsStreamer::Stream.new(jsm:, name:, subjects:).run
-    end
+    metrics_store.run
+    metrics_server.run
+    wait
+  ensure
+    stop
+    wait
 
-    Async::Notification.new.wait # wait forever
+    client.close
+  end
+
+  def stop
+    metrics_server.stop
+    streams.each(&:stop)
+    metrics_store.stop
+  end
+
+  def wait
+    metrics_server.wait
+    streams.each(&:wait)
+    metrics_store.wait
   end
 
   private
 
-  memoize def jsm
+  memoize def jsm = client.jsm
+
+  # TODO: move port to config
+  memoize def metrics_server = NatsStreamer::Metrics::Server.new(port: 9294, metrics_store:)
+  memoize def metrics_store = NatsStreamer::Metrics::Store.new
+
+  memoize def streams
+    config.streams.map do |name, subjects|
+      NatsStreamer::Stream.new(jsm:, name:, subjects:, metrics_store:).tap(&:run)
+    end
+  end
+
+  memoize def client
     NATS.connect(config.server_url).tap do
       info { "Connected to #{config.server_url}" }
-    end.jsm
+    end
   end
 end

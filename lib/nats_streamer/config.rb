@@ -1,24 +1,17 @@
 # frozen_string_literal: true
 
 class NatsStreamer::Config < Dry::Struct
-  Types = Dry.Types
+  T = Dry.Types
 
   class Subscriber < Dry::Struct
-    attribute :name, Types::String # Must be uniq
-    attribute :url, Types::String
-    attribute :params, Types::Hash.map(Types::Coercible::String, Types::String).default({}.freeze)
+    attribute :name, T::String # Must be uniq
+    attribute :url, T::String
+    attribute :params, T::Hash.map(T::Coercible::String, T::String).default({}.freeze)
   end
 
-  attribute :server_url, Types::Coercible::String
+  Events = T::Hash.map(T::Coercible::String, T::Array.of(Subscriber))
+  Subjects = T::Hash.map(T::Coercible::String, Events)
 
-  attribute :streams, Types::Hash.map(
-    Types::Coercible::String,
-    Types::Hash.map(
-      Types::Coercible::String,
-      Types::Hash.map(
-        Types::Coercible::String,
-        Types::Array.of(Subscriber)
-      )
-    )
-  )
+  attribute :server_url, T::Coercible::String
+  attribute :streams, T::Hash.map(T::Coercible::String, Subjects)
 end

@@ -1,14 +1,12 @@
 # frozen_string_literal: true
 
 class NatsStreamer::Stream
-  extend Dry::Initializer
+  include NatsStreamer::Helpers
 
-  include NatsStreamer::Logger
-  include Memery
-
-  option :jsm
-  option :name
-  option :subjects
+  option :jsm,  type: T.Instance(NATS::JetStream)
+  option :name, type: T::String
+  option :subjects, type: NatsStreamer::Config::Subjects
+  option :metrics_store, type: T.Instance(NatsStreamer::Metrics::Store)
 
   def run
     create_stream!
@@ -17,13 +15,18 @@ class NatsStreamer::Stream
       events.each do |event_name, subscribers|
         subscribers.each do |subscriber|
           subject = [subject, event_name].join(".")
-          NatsStreamer::Listener.new(jsm:, subject:, subscriber:).run
+          barrier.async { NatsStreamer::Listener.new(jsm:, subject:, subscriber:, metrics_store:).run }
         end
       end
     end
   end
 
+  def stop = barrier.stop
+  def wait = barrier.wait
+
   private
+
+  memoize def barrier = Async::Barrier.new
 
   # ["{subject_name}.{event_name}"]
   memoize def subject_names

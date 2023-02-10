@@ -6,7 +6,10 @@ require "yaml"
 require "zeitwerk"
 
 require "async"
+require "async/barrier"
+require "async/http"
 require "async/notification"
+
 require "nats/client"
 require "memery"
 require "faraday"

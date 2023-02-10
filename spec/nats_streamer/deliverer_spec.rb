@@ -1,8 +1,9 @@
 # frozen_string_literal: true
 
 RSpec.describe NatsStreamer::Deliverer do
-  let(:deliverer) { described_class.new(subscriber:) }
-  let(:subscriber) { instance_double(NatsStreamer::Config::Subscriber, url: "https://example.com", name: "test") }
+  let(:deliverer) { described_class.new(subscriber:, metrics_store:) }
+  let(:subscriber) { NatsStreamer::Config::Subscriber.new(url: "https://example.com", name: "test") }
+  let(:metrics_store) { NatsStreamer::Metrics::Store.new }
 
   describe "#deliver" do
     subject { deliverer.deliver(test: "value") }

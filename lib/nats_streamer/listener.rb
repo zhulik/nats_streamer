@@ -1,45 +1,38 @@
 # frozen_string_literal: true
 
 class NatsStreamer::Listener
-  extend Dry::Initializer
+  include NatsStreamer::Helpers
 
-  include NatsStreamer::Logger
-  include Memery
-
-  # TODO: how to propely unsubscribe?
-  option :jsm
-  option :subject
-  option :subscriber
+  option :jsm, type: T.Instance(NATS::JetStream)
+  option :subject, type: T::Coercible::String
+  option :subscriber, type: T.Instance(NatsStreamer::Config::Subscriber)
+  option :metrics_store, type: T.Instance(NatsStreamer::Metrics::Store)
 
   def run
     info { "Subscribing to #{subject}" }
 
-    pull do |msg|
-      Async { handle_message(msg) }
-    end
+    puller.pull { handle_message(_1) }
+    wait
   end
 
   private
 
+  memoize def durable = "nats-streamer-subscriber-#{subscriber.name}"
   memoize def params_renderer = NatsStreamer::ParamsRenderer.new(subject:, params: subscriber.params)
-  memoize def deliverer(subscriber) = NatsStreamer::Deliverer.new(subscriber:)
+  memoize def active_tasks = NatsStreamer::ActiveTasks.new
+  memoize def puller = NatsStreamer::Puller.new(jsm:, subject:, durable:)
+  memoize def deliverer = NatsStreamer::Deliverer.new(subscriber:, metrics_store:)
 
-  def pull(&)
-    psub = @jsm.pull_subscribe(subject, "nats-streamer-subscriber-#{subscriber.name}")
-
-    loop do
-      psub.fetch(1).each(&)
-    rescue NATS::IO::Timeout
-      debug { "Pulling timeout, retrying..." }
-    end
-  end
+  def wait = active_tasks.wait
 
   def handle_message(msg)
-    event = JSON.parse(msg.data, symbolize_names: true)
-    debug { "subject=#{subject}, event=#{event}" }
+    active_tasks.async do
+      event = JSON.parse(msg.data, symbolize_names: true)
+      debug { "subject=#{subject}, event=#{event}" }
 
-    deliverer(subscriber).deliver(**params_renderer.render(event))
+      deliverer.deliver(**params_renderer.render(event))
 
-    msg.ack
+      msg.ack
+    end
   end
 end

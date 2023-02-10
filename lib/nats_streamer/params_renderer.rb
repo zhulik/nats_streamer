@@ -1,13 +1,10 @@
 # frozen_string_literal: true
 
 class NatsStreamer::ParamsRenderer
-  extend Dry::Initializer
+  include NatsStreamer::Helpers
 
-  include NatsStreamer::Logger
-  include Memery
-
-  option :subject
-  option :params
+  option :subject, type: T::String
+  option :params, type: T::Hash.map(T::Coercible::Symbol, T::String)
 
   def render(event)
     params.transform_values do |v|

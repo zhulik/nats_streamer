@@ -1,7 +1,10 @@
 # frozen_string_literal: true
 
 ENV["CONSOLE_LEVEL"] ||= "fatal"
+
 require "webmock/rspec"
+require "async/rspec"
+
 require "simplecov"
 
 SimpleCov.start
@@ -18,4 +21,7 @@ RSpec.configure do |config|
   config.expect_with :rspec do |c|
     c.syntax = :expect
   end
+
+  config.include_context(Async::RSpec::Reactor, async: true)
+  config.include_context(Async::RSpec::Leaks, async: true)
 end

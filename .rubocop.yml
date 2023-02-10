@@ -41,3 +41,6 @@ Style/WordArray:
 
 Style/ClassAndModuleChildren:
   EnforcedStyle: compact
+
+RSpec/MultipleMemoizedHelpers:
+  Max: 10
