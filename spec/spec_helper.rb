@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+ENV["CONSOLE_LEVEL"] ||= "fatal"
+require "webmock/rspec"
 require "simplecov"
 
 SimpleCov.start
