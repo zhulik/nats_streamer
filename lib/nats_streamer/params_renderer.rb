@@ -7,10 +7,10 @@ class NatsStreamer::ParamsRenderer
   include Memery
 
   option :subject
-  option :subscriber
+  option :params
 
   def render(event)
-    subscriber.params.transform_values do |v|
+    params.transform_values do |v|
       binding.local_variable_set(:event, event)
       ERB.new(v).result(binding)
     end.merge(event:, subject:)

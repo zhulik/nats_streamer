@@ -12,9 +12,9 @@ module NatsStreamer::Logger
         Process.clock_gettime(Process::CLOCK_MONOTONIC) - start
       end
 
-      return Console.logger.public_send(name, self, msg) { block.call(elapsed) } unless block.nil?
+      return public_send(name, msg) { block.call(elapsed) } unless block.nil?
 
-      Console.logger.public_send(name, self, msg)
+      public_send(name, msg)
     end
   end
 end

@@ -21,7 +21,7 @@ class NatsStreamer::Listener
 
   private
 
-  memoize def params_renderer = NatsStreamer::ParamsRenderer.new(subject:, subscriber:)
+  memoize def params_renderer = NatsStreamer::ParamsRenderer.new(subject:, params: subscriber.params)
   memoize def deliverer(subscriber) = NatsStreamer::Deliverer.new(subscriber:)
 
   def pull(&)
